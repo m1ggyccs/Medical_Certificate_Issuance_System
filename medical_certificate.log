@@ -728,3 +728,7 @@
 2025-05-15 16:12:28,276 - INFO - Expert system analysis completed - Severity: normal
 2025-05-15 16:12:28,350 - INFO - Expert system analysis completed - Severity: high
 2025-05-15 16:12:28,357 - INFO - Simulation completed successfully: {'total_patients': 33, 'patients_seen': 28, 'certificates_issued': 28, 'average_wait_time': 25.09536321675845, 'certificate_issuance_rate': 100.0, 'simulation_duration_hours': 8, 'num_doctors': 2, 'num_nurses': 3, 'nurse_decisions': {'refer': 4, 'treat': 29}, 'doctor_decisions': {'issue': 28, 'deny': 0}}
+2025-05-15 18:08:49,540 - ERROR - Error showing simulation results: None is not a generator.
+2025-05-15 18:08:54,656 - ERROR - Error showing simulation results: None is not a generator.
+2025-05-15 18:09:21,951 - ERROR - Error showing simulation results: None is not a generator.
+2025-05-15 18:10:39,407 - ERROR - Error showing simulation results: None is not a generator.

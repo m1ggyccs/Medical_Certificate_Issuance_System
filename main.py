@@ -3,13 +3,13 @@ from tkinter import ttk, messagebox, scrolledtext
 import logging
 from datetime import datetime
 from predefined_cases import SIMULATION_SCENARIOS
-from simulation import run_simulation
+from simulation import run_simulation, ClinicConfig
 import ttkthemes
 import threading
 import queue
 import matplotlib
 matplotlib.use('Agg')
-from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Configure logging
@@ -18,6 +18,22 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+SURVEY_ASSUMPTIONS = {
+    'operating_hours': '8:30 AM - 5:00 PM (510 min)',
+    'nurses': 3,
+    'doctors': 1,
+    'clinic_staff': 1,
+    'director': 1,
+    'peak_hours': '10:00-11:30 AM, 1:30-5:00 PM',
+    'nurse_inquiry': 5,
+    'simple_case': 3,
+    'complex_case': 10,
+    'finalization': 2,
+    'it_input': 2,
+    'avg_wait_time': 5,  # Example survey value for comparison
+    'success_rate': 90,  # Example survey value for comparison
+}
 
 class ModernFrame(ttk.Frame):
     """A custom frame with modern styling"""
@@ -314,46 +330,10 @@ class MedicalCertificateSystem:
 
     def create_graphs_tab(self, parent):
         frame = ttk.Frame(parent)
-        self.graph_frame = frame
         self.graph_canvas = None
-        self.graph_stats = {
-            'total_patients': 0,
-            'certificates_issued': 0,
-            'cases': 0,
-            'visits': 0
-        }
-        self.draw_graph()
+        self.graph_frame = ttk.Frame(frame)
+        self.graph_frame.pack(fill='both', expand=True)
         return frame
-
-    def draw_graph(self):
-        # Remove old canvas if exists
-        if hasattr(self, 'graph_canvas') and self.graph_canvas:
-            self.graph_canvas.get_tk_widget().destroy()
-        # Prepare data
-        stats = self.graph_stats
-        labels = ['Total Patients', 'Certificates Issued', 'Cases', 'Visits']
-        values = [
-            stats.get('total_patients', 0),
-            stats.get('certificates_issued', 0),
-            stats.get('cases', 0),
-            stats.get('visits', 0)
-        ]
-        fig = Figure(figsize=(5, 3), dpi=100)
-        ax = fig.add_subplot(111)
-        bars = ax.bar(labels, values, color=['#6C5CE7', '#00B894', '#FDCB6E', '#A8A5E6'])
-        ax.set_ylabel('Count')
-        ax.set_title('Simulation Summary')
-        for bar in bars:
-            height = bar.get_height()
-            ax.annotate(f'{int(height)}',
-                        xy=(bar.get_x() + bar.get_width() / 2, height),
-                        xytext=(0, 3),  # 3 points vertical offset
-                        textcoords="offset points",
-                        ha='center', va='bottom')
-        fig.tight_layout()
-        self.graph_canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
-        self.graph_canvas.draw()
-        self.graph_canvas.get_tk_widget().pack(fill='both', expand=True)
 
     def show_tab(self, tab_name):
         for name, frame in self.tabs.items():
@@ -546,33 +526,47 @@ class MedicalCertificateSystem:
                 messagebox.showerror("Simulation Error", results['error'])
                 return
 
+            # Run survey-based simulation for comparison
+            survey_results = self.run_survey_simulation()
+
             # Update statistics text
             self.stats_text.config(state=tk.NORMAL)
             self.stats_text.delete(1.0, tk.END)
 
-            # Format and display results
-            self.stats_text.insert(tk.END, f"""Simulation Results Summary
-            
-Total Statistics:
-----------------
-Total Patients: {results.get('total_patients', 0)}
-Patients Seen: {results.get('patients_seen', 0)}
-Certificates Issued: {results.get('certificates_issued', 0)}
-Average Wait Time: {results.get('average_wait_time', 0):.2f} minutes
-Certificate Success Rate: {results.get('certificate_issuance_rate', 0):.1f}%
+            # User simulation block
+            self.stats_text.insert(tk.END, "Your Simulation Results\n=======================\n")
+            self.stats_text.insert(tk.END, f"Total Patients: {results.get('total_patients', 0)}\n")
+            self.stats_text.insert(tk.END, f"Patients Seen: {results.get('patients_seen', 0)}\n")
+            self.stats_text.insert(tk.END, f"Certificates Issued: {results.get('certificates_issued', 0)}\n")
+            self.stats_text.insert(tk.END, f"Average Wait Time: {results.get('average_wait_time', 0):.2f} minutes\n")
+            self.stats_text.insert(tk.END, f"Certificate Success Rate: {results.get('certificate_issuance_rate', 0):.1f}%\n")
+            self.stats_text.insert(tk.END, f"Cases: {results.get('simple_cases', 0)}\n")
+            self.stats_text.insert(tk.END, f"Visits: {results.get('off_peak_visits', 0)}\n")
+            self.stats_text.insert(tk.END, "\n")
 
-Case Distribution:
-----------------
-Cases: {results.get('simple_cases', 0)}
-Visits: {results.get('off_peak_visits', 0)}
-""")
+            # Survey simulation block
+            self.stats_text.insert(tk.END, "Survey-Based Simulation\n=======================\n")
+            self.stats_text.insert(tk.END, f"Total Patients: {survey_results.get('total_patients', 0)}\n")
+            self.stats_text.insert(tk.END, f"Patients Seen: {survey_results.get('patients_seen', 0)}\n")
+            self.stats_text.insert(tk.END, f"Certificates Issued: {survey_results.get('certificates_issued', 0)}\n")
+            self.stats_text.insert(tk.END, f"Average Wait Time: {survey_results.get('average_wait_time', 0):.2f} minutes\n")
+            self.stats_text.insert(tk.END, f"Certificate Success Rate: {survey_results.get('certificate_issuance_rate', 0):.1f}%\n")
+            self.stats_text.insert(tk.END, f"Cases: {survey_results.get('simple_cases', 0)}\n")
+            self.stats_text.insert(tk.END, f"Visits: {survey_results.get('off_peak_visits', 0)}\n")
+            self.stats_text.insert(tk.END, "\n")
+
+            # Add comparison to survey assumptions (for reference)
+            self.stats_text.insert(tk.END, "--- Survey Assumptions Reference ---\n")
+            self.stats_text.insert(tk.END, f"Operating Hours: {SURVEY_ASSUMPTIONS['operating_hours']}\n")
+            self.stats_text.insert(tk.END, f"Nurses: {SURVEY_ASSUMPTIONS['nurses']}\n")
+            self.stats_text.insert(tk.END, f"Doctors: {SURVEY_ASSUMPTIONS['doctors']}\n")
+            self.stats_text.insert(tk.END, f"Nurse Inquiry: {SURVEY_ASSUMPTIONS['nurse_inquiry']} min\nSimple Case: {SURVEY_ASSUMPTIONS['simple_case']} min\nComplex Case: {SURVEY_ASSUMPTIONS['complex_case']} min\nFinalization: {SURVEY_ASSUMPTIONS['finalization']} min\nIT Input: {SURVEY_ASSUMPTIONS['it_input']} min\n")
             self.stats_text.config(state=tk.DISABLED)
 
             # Update complexity labels
             self.complexity_labels['simple'].config(
                 text=f"Cases: {results.get('simple_cases', 0)}"
             )
-            # Remove complex label if present
             if 'complex' in self.complexity_labels:
                 self.complexity_labels['complex'].pack_forget()
 
@@ -584,15 +578,8 @@ Visits: {results.get('off_peak_visits', 0)}
                 text=f"Visits: {results.get('off_peak_visits', 0)}"
             )
 
-            # Update graph data and redraw
-            self.graph_stats = {
-                'total_patients': results.get('total_patients', 0),
-                'certificates_issued': results.get('certificates_issued', 0),
-                'cases': results.get('simple_cases', 0),
-                'visits': results.get('off_peak_visits', 0)
-            }
-            if hasattr(self, 'draw_graph'):
-                self.draw_graph()
+            # Update graph tab with comparison
+            self.update_graphs_tab(results, survey_results)
 
             # Add completion event
             self.add_event(
@@ -603,6 +590,50 @@ Visits: {results.get('off_peak_visits', 0)}
         except Exception as e:
             logging.error(f"Error showing simulation results: {str(e)}")
             messagebox.showerror("Error", f"Failed to display simulation results: {str(e)}")
+
+    def run_survey_simulation(self):
+        # Use survey-based parameters
+        survey_config = ClinicConfig(
+            OPENING_TIME="08:30",
+            CLOSING_TIME="17:00",
+            MAX_NURSES=3,
+            MAX_DOCTORS=1,
+            MAX_STAFF=1,
+            NURSE_PROCESS_TIME=5,   # Nurse Inquiry
+            DOCTOR_PROCESS_TIME=10, # Complex Case
+            STAFF_PROCESS_TIME=2    # Certificate Finalization
+        )
+        # Duration: 510 minutes = 8.5 hours
+        return run_simulation(duration_hours=8.5, num_doctors=1, num_nurses=3, event_callback=None)
+
+    def update_graphs_tab(self, results, survey_results=None):
+        # Remove previous graph if exists
+        for widget in self.graph_frame.winfo_children():
+            widget.destroy()
+        # Prepare data for comparison
+        sim_wait = results.get('average_wait_time', 0)
+        sim_rate = results.get('certificate_issuance_rate', 0)
+        if survey_results:
+            survey_wait = survey_results.get('average_wait_time', 0)
+            survey_rate = survey_results.get('certificate_issuance_rate', 0)
+        else:
+            survey_wait = SURVEY_ASSUMPTIONS['avg_wait_time']
+            survey_rate = SURVEY_ASSUMPTIONS['success_rate']
+        labels = ['Avg. Wait Time (min)', 'Success Rate (%)']
+        sim_values = [sim_wait, sim_rate]
+        survey_values = [survey_wait, survey_rate]
+        x = range(len(labels))
+        fig, ax = plt.subplots(figsize=(5,3))
+        ax.bar([i-0.2 for i in x], sim_values, width=0.4, label='Simulation', color='#6C5CE7')
+        ax.bar([i+0.2 for i in x], survey_values, width=0.4, label='Survey', color='#00B894')
+        ax.set_xticks(list(x))
+        ax.set_xticklabels(labels)
+        ax.legend()
+        ax.set_title('Simulation vs Survey Comparison')
+        fig.tight_layout()
+        self.graph_canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
+        self.graph_canvas.draw()
+        self.graph_canvas.get_tk_widget().pack(fill='both', expand=True)
 
     def reset_statistics(self):
         """Reset all statistics and clear events."""
