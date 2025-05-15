@@ -638,25 +638,31 @@ class MedicalCertificateSystem:
         for widget in self.graph_frame.winfo_children():
             widget.destroy()
         # Prepare data for comparison
+        sim_total_patients = results.get('total_patients', 0)
+        sim_cert_issued = results.get('certificates_issued', 0)
         sim_wait = results.get('average_wait_time', 0)
         sim_rate = results.get('certificate_issuance_rate', 0)
         if survey_results:
+            survey_total_patients = survey_results.get('total_patients', 0)
+            survey_cert_issued = survey_results.get('certificates_issued', 0)
             survey_wait = survey_results.get('average_wait_time', 0)
             survey_rate = survey_results.get('certificate_issuance_rate', 0)
         else:
+            survey_total_patients = SURVEY_ASSUMPTIONS.get('total_patients', 0)
+            survey_cert_issued = SURVEY_ASSUMPTIONS.get('certificates_issued', 0)
             survey_wait = SURVEY_ASSUMPTIONS['avg_wait_time']
             survey_rate = SURVEY_ASSUMPTIONS['success_rate']
-        labels = ['Avg. Wait Time (min)', 'Success Rate (%)']
-        sim_values = [sim_wait, sim_rate]
-        survey_values = [survey_wait, survey_rate]
+        labels = ['Total Patients', 'Certificates Issued', 'Avg. Wait Time (min)', 'Success Rate (%)']
+        sim_values = [sim_total_patients, sim_cert_issued, sim_wait, sim_rate]
+        survey_values = [survey_total_patients, survey_cert_issued, survey_wait, survey_rate]
         x = range(len(labels))
-        fig, ax = plt.subplots(figsize=(5,3))
-        ax.bar([i-0.2 for i in x], sim_values, width=0.4, label='Simulation', color='#6C5CE7')
-        ax.bar([i+0.2 for i in x], survey_values, width=0.4, label='Survey', color='#00B894')
+        fig, ax = plt.subplots(figsize=(7,4))
+        ax.bar([i-0.2 for i in x], sim_values, width=0.4, label='Agent-Based', color='#6C5CE7')
+        ax.bar([i+0.2 for i in x], survey_values, width=0.4, label='Survey-Based', color='#00B894')
         ax.set_xticks(list(x))
         ax.set_xticklabels(labels)
         ax.legend()
-        ax.set_title('Simulation vs Survey Comparison')
+        ax.set_title('Agent-Based vs Survey-Based Simulation Comparison')
         fig.tight_layout()
         self.graph_canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
         self.graph_canvas.draw()
