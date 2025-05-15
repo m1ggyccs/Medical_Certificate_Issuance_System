@@ -1,0 +1,9 @@
+tkinter
+experta==1.9.4
+simpy==4.0.1
+matplotlib==3.7.1
+reportlab==4.0.4
+pillow==10.0.0
+tkcalendar==1.6.1
+sqlite3
+ttkthemes==3.2.2 
