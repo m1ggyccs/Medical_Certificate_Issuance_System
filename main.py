@@ -536,7 +536,8 @@ class MedicalCertificateSystem:
                 duration_hours=duration,
                 num_doctors=num_doctors,
                 num_nurses=num_nurses,
-                event_callback=self.handle_simulation_event
+                event_callback=self.handle_simulation_event,
+                config=custom_config
             )
             # Update final results
             self.root.after(0, self.show_simulation_results, results)

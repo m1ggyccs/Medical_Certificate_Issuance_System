@@ -273,15 +273,16 @@ class ClinicSimulation:
                 }
             })
 
-def run_simulation(duration_hours=8, num_doctors=1, num_nurses=3, event_callback=None):
+def run_simulation(duration_hours=8, num_doctors=1, num_nurses=3, event_callback=None, config=None):
     """Run the clinic simulation"""
     try:
         # Initialize simulation
         env = simpy.Environment()
-        config = ClinicConfig(
-            MAX_DOCTORS=num_doctors,
-            MAX_NURSES=num_nurses
-        )
+        if config is None:
+            config = ClinicConfig(
+                MAX_DOCTORS=num_doctors,
+                MAX_NURSES=num_nurses
+            )
         clinic = ClinicSimulation(env, config, event_callback)
         
         def student_generator(env, clinic):
