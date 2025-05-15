@@ -303,9 +303,22 @@ class MedicalCertificateSystem:
         ttk.Label(controls_frame, text="Duration (hours):").grid(row=0, column=4, padx=5, pady=5, sticky='e')
         self.duration_var = tk.StringVar(value="8")
         ttk.Entry(controls_frame, textvariable=self.duration_var, width=5).grid(row=0, column=5, padx=5, pady=5)
+        # New agent-based timing controls
+        ttk.Label(controls_frame, text="Nurse Inquiry (min):").grid(row=1, column=0, padx=5, pady=5, sticky='e')
+        self.nurse_inquiry_var = tk.StringVar(value="5")
+        ttk.Entry(controls_frame, textvariable=self.nurse_inquiry_var, width=5).grid(row=1, column=1, padx=5, pady=5)
+        ttk.Label(controls_frame, text="Simple Case (min):").grid(row=1, column=2, padx=5, pady=5, sticky='e')
+        self.simple_case_var = tk.StringVar(value="3")
+        ttk.Entry(controls_frame, textvariable=self.simple_case_var, width=5).grid(row=1, column=3, padx=5, pady=5)
+        ttk.Label(controls_frame, text="Complex Case (min):").grid(row=1, column=4, padx=5, pady=5, sticky='e')
+        self.complex_case_var = tk.StringVar(value="10")
+        ttk.Entry(controls_frame, textvariable=self.complex_case_var, width=5).grid(row=1, column=5, padx=5, pady=5)
+        ttk.Label(controls_frame, text="Finalization (min):").grid(row=1, column=6, padx=5, pady=5, sticky='e')
+        self.finalization_var = tk.StringVar(value="2")
+        ttk.Entry(controls_frame, textvariable=self.finalization_var, width=5).grid(row=1, column=7, padx=5, pady=5)
         # Control buttons
-        ttk.Button(controls_frame, text="Start Simulation", command=self.run_simulation, style='Action.TButton').grid(row=0, column=6, padx=10, pady=5)
-        ttk.Button(controls_frame, text="Reset", command=self.reset_statistics).grid(row=0, column=7, padx=5, pady=5)
+        ttk.Button(controls_frame, text="Start Simulation", command=self.run_simulation, style='Action.TButton').grid(row=2, column=6, padx=10, pady=5)
+        ttk.Button(controls_frame, text="Reset", command=self.reset_statistics).grid(row=2, column=7, padx=5, pady=5)
         controls_frame.grid_columnconfigure((1,3,5,7), weight=0)
         controls_frame.grid_columnconfigure((0,2,4,6), weight=0)
 
@@ -468,51 +481,65 @@ class MedicalCertificateSystem:
             if self.is_simulating:
                 messagebox.showwarning("Warning", "Simulation is already running")
                 return
-                
+
             self.is_simulating = True
             num_doctors = int(self.doctors_var.get())
             num_nurses = int(self.nurses_var.get())
-            duration = int(self.duration_var.get())
-            
+            duration = float(self.duration_var.get())
+            nurse_inquiry = int(self.nurse_inquiry_var.get())
+            simple_case = int(self.simple_case_var.get())
+            complex_case = int(self.complex_case_var.get())
+            finalization = int(self.finalization_var.get())
+
             # Clear previous events
             for widget in self.events_list.winfo_children():
                 widget.destroy()
-            
+
             # Reset statistics
             for card in self.stat_cards.values():
                 card.update_value("0")
-            
+
             # Add initial event
             self.add_event("Starting Simulation", 
                           f"Doctors: {num_doctors}, Nurses: {num_nurses}, Duration: {duration}h",
                           category="SYSTEM")
-            
+
             # Start simulation in a separate thread
             self.sim_thread = threading.Thread(
                 target=self._run_simulation_thread,
-                args=(duration, num_doctors, num_nurses)
+                args=(duration, num_doctors, num_nurses, nurse_inquiry, simple_case, complex_case, finalization)
             )
             self.sim_thread.daemon = True
             self.sim_thread.start()
-            
+
         except ValueError as e:
             messagebox.showerror("Error", "Please enter valid numbers for resources and duration.")
         except Exception as e:
             messagebox.showerror("Error", f"Simulation error: {str(e)}")
 
-    def _run_simulation_thread(self, duration, num_doctors, num_nurses):
+    def _run_simulation_thread(self, duration, num_doctors, num_nurses, nurse_inquiry, simple_case, complex_case, finalization):
         """Run the simulation in a separate thread."""
         try:
+            # Create a custom ClinicConfig for agent-based simulation
+            custom_config = ClinicConfig(
+                OPENING_TIME="08:30",
+                CLOSING_TIME="17:00",
+                MAX_NURSES=num_nurses,
+                MAX_DOCTORS=num_doctors,
+                MAX_STAFF=1,
+                NURSE_PROCESS_TIME=nurse_inquiry,
+                DOCTOR_PROCESS_TIME=complex_case,
+                STAFF_PROCESS_TIME=finalization
+            )
+            # Run the simulation with the custom config
             results = run_simulation(
                 duration_hours=duration,
                 num_doctors=num_doctors,
                 num_nurses=num_nurses,
                 event_callback=self.handle_simulation_event
             )
-            
             # Update final results
             self.root.after(0, self.show_simulation_results, results)
-            
         except Exception as e:
             self.root.after(0, messagebox.showerror, "Error", f"Simulation error: {str(e)}")
         finally:
@@ -534,7 +561,7 @@ class MedicalCertificateSystem:
             self.stats_text.delete(1.0, tk.END)
 
             # User simulation block
-            self.stats_text.insert(tk.END, "Your Simulation Results\n=======================\n")
+            self.stats_text.insert(tk.END, "Agent-Based Simulation\n=======================\n")
             self.stats_text.insert(tk.END, f"Total Patients: {results.get('total_patients', 0)}\n")
             self.stats_text.insert(tk.END, f"Patients Seen: {results.get('patients_seen', 0)}\n")
             self.stats_text.insert(tk.END, f"Certificates Issued: {results.get('certificates_issued', 0)}\n")
