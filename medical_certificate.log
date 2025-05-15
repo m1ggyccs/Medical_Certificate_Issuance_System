@@ -732,3 +732,4 @@
 2025-05-15 18:08:54,656 - ERROR - Error showing simulation results: None is not a generator.
 2025-05-15 18:09:21,951 - ERROR - Error showing simulation results: None is not a generator.
 2025-05-15 18:10:39,407 - ERROR - Error showing simulation results: None is not a generator.
+2025-05-15 18:33:20,188 - ERROR - Error showing simulation results: 'MedicalCertificateSystem' object has no attribute 'complexity_labels'
