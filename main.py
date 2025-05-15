@@ -7,6 +7,10 @@ from simulation import run_simulation
 import ttkthemes
 import threading
 import queue
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Configure logging
 logging.basicConfig(
@@ -310,9 +314,46 @@ class MedicalCertificateSystem:
 
     def create_graphs_tab(self, parent):
         frame = ttk.Frame(parent)
-        # Placeholder for future graph content
-        ttk.Label(frame, text="Graphs will be shown here.", font=('Segoe UI', 14)).pack(pady=20)
+        self.graph_frame = frame
+        self.graph_canvas = None
+        self.graph_stats = {
+            'total_patients': 0,
+            'certificates_issued': 0,
+            'cases': 0,
+            'visits': 0
+        }
+        self.draw_graph()
         return frame
+
+    def draw_graph(self):
+        # Remove old canvas if exists
+        if hasattr(self, 'graph_canvas') and self.graph_canvas:
+            self.graph_canvas.get_tk_widget().destroy()
+        # Prepare data
+        stats = self.graph_stats
+        labels = ['Total Patients', 'Certificates Issued', 'Cases', 'Visits']
+        values = [
+            stats.get('total_patients', 0),
+            stats.get('certificates_issued', 0),
+            stats.get('cases', 0),
+            stats.get('visits', 0)
+        ]
+        fig = Figure(figsize=(5, 3), dpi=100)
+        ax = fig.add_subplot(111)
+        bars = ax.bar(labels, values, color=['#6C5CE7', '#00B894', '#FDCB6E', '#A8A5E6'])
+        ax.set_ylabel('Count')
+        ax.set_title('Simulation Summary')
+        for bar in bars:
+            height = bar.get_height()
+            ax.annotate(f'{int(height)}',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3),  # 3 points vertical offset
+                        textcoords="offset points",
+                        ha='center', va='bottom')
+        fig.tight_layout()
+        self.graph_canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
+        self.graph_canvas.draw()
+        self.graph_canvas.get_tk_widget().pack(fill='both', expand=True)
 
     def show_tab(self, tab_name):
         for name, frame in self.tabs.items():
@@ -542,6 +583,16 @@ Visits: {results.get('off_peak_visits', 0)}
             self.peak_labels['off_peak'].config(
                 text=f"Visits: {results.get('off_peak_visits', 0)}"
             )
+
+            # Update graph data and redraw
+            self.graph_stats = {
+                'total_patients': results.get('total_patients', 0),
+                'certificates_issued': results.get('certificates_issued', 0),
+                'cases': results.get('simple_cases', 0),
+                'visits': results.get('off_peak_visits', 0)
+            }
+            if hasattr(self, 'draw_graph'):
+                self.draw_graph()
 
             # Add completion event
             self.add_event(
