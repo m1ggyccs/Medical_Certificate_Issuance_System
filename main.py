@@ -83,33 +83,40 @@ class EventItem(ttk.Frame):
         self.style = ttk.Style()
         
         # Frame styles
-        self.style.configure('Card.TFrame', background=colors['surface'])
-        self.style.configure('ListItem.TFrame', background=colors['surface'])
+        self.style.configure('Card.TFrame', background=colors['background'])
+        self.style.configure('ListItem.TFrame', background=colors['background'])
         self.style.configure('Sidebar.TFrame', background=colors['surface'])
         self.style.configure('Tab.TFrame', background=colors['background'])
         
         # Label styles
         self.style.configure('CardTitle.TLabel',
                            font=('Segoe UI', 12),
-                           foreground=colors['text'])
+                           foreground=colors['text'],
+                           background=colors['background'])
         self.style.configure('CardValue.TLabel',
                            font=('Segoe UI', 24, 'bold'),
-                           foreground=colors['primary'])
+                           foreground=colors['primary'],
+                           background=colors['background'])
         self.style.configure('CardIcon.TLabel',
                            font=('Segoe UI', 24),
-                           foreground=colors['secondary'])
+                           foreground=colors['secondary'],
+                           background=colors['background'])
         self.style.configure('EventTitle.TLabel',
                            font=('Segoe UI', 11, 'bold'),
-                           foreground=colors['text'])
+                           foreground=colors['text'],
+                           background=colors['background'])
         self.style.configure('EventDesc.TLabel',
                            font=('Segoe UI', 10),
-                           foreground=colors['secondary'])
+                           foreground=colors['secondary'],
+                           background=colors['background'])
         self.style.configure('EventTime.TLabel',
                            font=('Segoe UI', 10),
-                           foreground=colors['secondary'])
+                           foreground=colors['secondary'],
+                           background=colors['background'])
         self.style.configure('EventIcon.TLabel',
                            font=('Segoe UI', 16),
-                           foreground=colors['primary'])
+                           foreground=colors['primary'],
+                           background=colors['background'])
         
         # Tab styles
         self.style.configure('TNotebook.Tab', padding=[12, 8], font=('Segoe UI', 10))
@@ -163,162 +170,172 @@ class MedicalCertificateSystem:
         self.style = ttk.Style()
         
         # Frame styles
-        self.style.configure('Card.TFrame', background=colors['surface'])
-        self.style.configure('ListItem.TFrame', background=colors['surface'])
+        self.style.configure('Card.TFrame', background=colors['background'])
+        self.style.configure('ListItem.TFrame', background=colors['background'])
         self.style.configure('Sidebar.TFrame', background=colors['surface'])
+        self.style.configure('Tab.TFrame', background=colors['background'])
         
         # Label styles
         self.style.configure('CardTitle.TLabel',
                            font=('Segoe UI', 12),
-                           foreground=colors['text'])
+                           foreground=colors['text'],
+                           background=colors['background'])
         self.style.configure('CardValue.TLabel',
                            font=('Segoe UI', 24, 'bold'),
-                           foreground=colors['primary'])
+                           foreground=colors['primary'],
+                           background=colors['background'])
         self.style.configure('CardIcon.TLabel',
                            font=('Segoe UI', 24),
-                           foreground=colors['secondary'])
+                           foreground=colors['secondary'],
+                           background=colors['background'])
         self.style.configure('EventTitle.TLabel',
                            font=('Segoe UI', 11, 'bold'),
-                           foreground=colors['text'])
+                           foreground=colors['text'],
+                           background=colors['background'])
         self.style.configure('EventDesc.TLabel',
                            font=('Segoe UI', 10),
-                           foreground=colors['secondary'])
+                           foreground=colors['secondary'],
+                           background=colors['background'])
         self.style.configure('EventTime.TLabel',
                            font=('Segoe UI', 10),
-                           foreground=colors['secondary'])
+                           foreground=colors['secondary'],
+                           background=colors['background'])
         self.style.configure('EventIcon.TLabel',
                            font=('Segoe UI', 16),
-                           foreground=colors['primary'])
+                           foreground=colors['primary'],
+                           background=colors['background'])
         
         # Button styles
         self.style.configure('Action.TButton',
                            font=('Segoe UI', 11),
                            background=colors['primary'],
-                           foreground=colors['surface'])
+                           foreground='#000000')
+        # Navigation button style
+        self.style.configure('Nav.TButton', font=('Segoe UI', 12, 'bold'), padding=10)
 
     def create_main_layout(self):
         # Main container with padding
         self.main_container = ttk.Frame(self.root, padding="20")
         self.main_container.pack(fill=tk.BOTH, expand=True)
-        
-        # Left sidebar (30% width)
-        self.sidebar = ttk.Frame(self.main_container, style='Sidebar.TFrame')
-        self.sidebar.pack(side='left', fill='y', padx=(0,20))
-        
-        # Create sidebar content
+
+        # Sidebar (only title and navigation buttons)
+        self.sidebar = ttk.Frame(self.main_container, style='Sidebar.TFrame', width=220)
+        self.sidebar.pack(side='left', fill='y', padx=(0, 20))
         self.create_sidebar()
-        
-        # Main content area (70% width)
+
+        # Main content area
         self.content = ttk.Frame(self.main_container)
         self.content.pack(side='left', fill='both', expand=True)
-        
-        # Create main content
-        self.create_dashboard()
 
-    def create_sidebar(self):
-        # Profile section
-        profile_frame = ttk.Frame(self.sidebar)
-        profile_frame.pack(fill='x', pady=(0,20))
-        
-        ttk.Label(profile_frame, text="Medical Certificate", 
-                 font=('Segoe UI', 18, 'bold')).pack(anchor='w')
-        ttk.Label(profile_frame, text="Simulation Dashboard",
-                 font=('Segoe UI', 12)).pack(anchor='w')
-        
-        # Simulation controls
-        controls_frame = ttk.LabelFrame(self.sidebar, text="Simulation Controls", padding=10)
-        controls_frame.pack(fill='x', pady=(0,20))
-        
-        # Resource inputs
-        ttk.Label(controls_frame, text="Number of Doctors:").pack(anchor='w', pady=(0,5))
-        self.doctors_var = tk.StringVar(value="2")
-        ttk.Entry(controls_frame, textvariable=self.doctors_var).pack(fill='x', pady=(0,10))
-        
-        ttk.Label(controls_frame, text="Number of Nurses:").pack(anchor='w', pady=(0,5))
-        self.nurses_var = tk.StringVar(value="3")
-        ttk.Entry(controls_frame, textvariable=self.nurses_var).pack(fill='x', pady=(0,10))
-        
-        ttk.Label(controls_frame, text="Duration (hours):").pack(anchor='w', pady=(0,5))
-        self.duration_var = tk.StringVar(value="8")
-        ttk.Entry(controls_frame, textvariable=self.duration_var).pack(fill='x', pady=(0,10))
-        
-        # Control buttons
-        ttk.Button(controls_frame, text="Start Simulation", 
-                  command=self.run_simulation, style='Action.TButton').pack(fill='x', pady=(10,5))
-        ttk.Button(controls_frame, text="Reset", 
-                  command=self.reset_statistics).pack(fill='x')
-
-    def create_dashboard(self):
-        # Statistics cards row
+        # Top row: stat cards
         stats_frame = ttk.Frame(self.content)
-        stats_frame.pack(fill='x', pady=(0,20))
-        
-        # Create stat cards
+        stats_frame.pack(fill='x', pady=(0, 10))
         self.stat_cards = {
             'current_patients': StatCard(stats_frame, "Current Patients", "0", "👥"),
             'waiting_time': StatCard(stats_frame, "Avg. Waiting Time", "0.0 min", "⏱️"),
             'certificates': StatCard(stats_frame, "Certificates", "0", "📄"),
             'success_rate': StatCard(stats_frame, "Success Rate", "0.0%", "📊")
         }
-        
-        # Layout stat cards in grid
         for i, card in enumerate(self.stat_cards.values()):
             card.grid(row=0, column=i, padx=5, sticky='nsew')
         stats_frame.grid_columnconfigure((0,1,2,3), weight=1)
-        
-        # Create tabs container
-        self.notebook = ttk.Notebook(self.content)
-        self.notebook.pack(fill='both', expand=True)
-        
-        # Real-time events tab
-        self.events_frame = ttk.Frame(self.notebook, style='Tab.TFrame', padding=10)
-        self.notebook.add(self.events_frame, text="Real-time Events")
-        
+
+        # Simulation controls row (below stat cards)
+        self.sim_controls_frame = ttk.Frame(self.content)
+        self.sim_controls_frame.pack(fill='x', pady=(0, 10))
+        self.create_simulation_controls(self.sim_controls_frame)
+
+        # Main area for tab content
+        self.tab_content_frame = ttk.Frame(self.content)
+        self.tab_content_frame.pack(fill='both', expand=True)
+
+        # Create all tab frames but only show one at a time
+        self.tabs = {
+            'events': self.create_events_tab(self.tab_content_frame),
+            'statistics': self.create_statistics_tab(self.tab_content_frame),
+            'graphs': self.create_graphs_tab(self.tab_content_frame)
+        }
+        self.show_tab('events')
+
+    def create_sidebar(self):
+        # Sidebar title
+        profile_frame = ttk.Frame(self.sidebar)
+        profile_frame.pack(fill='x', pady=(0, 30))
+        ttk.Label(profile_frame, text="MCIS System", font=('Segoe UI', 18, 'bold')).pack(anchor='center')
+
+        # Navigation buttons
+        nav_frame = ttk.Frame(self.sidebar)
+        nav_frame.pack(fill='x', pady=(0, 10))
+        ttk.Button(nav_frame, text="Real-time Events", command=lambda: self.show_tab('events'), style='Nav.TButton').pack(fill='x', pady=8)
+        ttk.Button(nav_frame, text="Statistics", command=lambda: self.show_tab('statistics'), style='Nav.TButton').pack(fill='x', pady=8)
+        ttk.Button(nav_frame, text="Graphs", command=lambda: self.show_tab('graphs'), style='Nav.TButton').pack(fill='x', pady=8)
+
+    def create_simulation_controls(self, parent):
+        controls_frame = ttk.Frame(parent)
+        controls_frame.pack(fill='x')
+        # Resource inputs (horizontal)
+        ttk.Label(controls_frame, text="Number of Doctors:").grid(row=0, column=0, padx=5, pady=5, sticky='e')
+        self.doctors_var = tk.StringVar(value="2")
+        ttk.Entry(controls_frame, textvariable=self.doctors_var, width=5).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Label(controls_frame, text="Number of Nurses:").grid(row=0, column=2, padx=5, pady=5, sticky='e')
+        self.nurses_var = tk.StringVar(value="3")
+        ttk.Entry(controls_frame, textvariable=self.nurses_var, width=5).grid(row=0, column=3, padx=5, pady=5)
+        ttk.Label(controls_frame, text="Duration (hours):").grid(row=0, column=4, padx=5, pady=5, sticky='e')
+        self.duration_var = tk.StringVar(value="8")
+        ttk.Entry(controls_frame, textvariable=self.duration_var, width=5).grid(row=0, column=5, padx=5, pady=5)
+        # Control buttons
+        ttk.Button(controls_frame, text="Start Simulation", command=self.run_simulation, style='Action.TButton').grid(row=0, column=6, padx=10, pady=5)
+        ttk.Button(controls_frame, text="Reset", command=self.reset_statistics).grid(row=0, column=7, padx=5, pady=5)
+        controls_frame.grid_columnconfigure((1,3,5,7), weight=0)
+        controls_frame.grid_columnconfigure((0,2,4,6), weight=0)
+
+    def create_events_tab(self, parent):
+        frame = ttk.Frame(parent)
         # Events list with scrollbar
-        self.events_canvas = tk.Canvas(self.events_frame, background='#F8F9FA', highlightthickness=0)
-        scrollbar = ttk.Scrollbar(self.events_frame, orient="vertical", command=self.events_canvas.yview)
-        self.events_list = ttk.Frame(self.events_frame, style='Tab.TFrame')
-        
+        self.events_canvas = tk.Canvas(frame, background='#F8F9FA', highlightthickness=0)
+        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=self.events_canvas.yview)
+        self.events_list = ttk.Frame(self.events_canvas, style='Tab.TFrame')
         self.events_canvas.configure(yscrollcommand=scrollbar.set)
-        
-        # Pack scrolling list
         scrollbar.pack(side="right", fill="y")
         self.events_canvas.pack(side="left", fill="both", expand=True)
         self.events_canvas.create_window((0, 0), window=self.events_list, anchor="nw")
-        
-        # Configure canvas scrolling
         self.events_list.bind("<Configure>", self._on_frame_configure)
         self.events_canvas.bind('<Configure>', self._on_canvas_configure)
-        
-        # Statistics tab
-        self.stats_frame = ttk.Frame(self.notebook, style='Tab.TFrame', padding=10)
-        self.notebook.add(self.stats_frame, text="Statistics")
-        
-        # Create statistics sections
-        self.create_statistics_sections()
+        return frame
 
-    def create_statistics_sections(self):
-        """Create detailed statistics sections"""
+    def create_statistics_tab(self, parent):
+        frame = ttk.Frame(parent)
+        self.create_statistics_sections_in_tab(frame)
+        return frame
+
+    def create_graphs_tab(self, parent):
+        frame = ttk.Frame(parent)
+        # Placeholder for future graph content
+        ttk.Label(frame, text="Graphs will be shown here.", font=('Segoe UI', 14)).pack(pady=20)
+        return frame
+
+    def show_tab(self, tab_name):
+        for name, frame in self.tabs.items():
+            frame.pack_forget()
+        self.tabs[tab_name].pack(fill='both', expand=True)
+
+    def create_statistics_sections_in_tab(self, parent):
         # Main statistics text
-        self.stats_text = scrolledtext.ScrolledText(self.stats_frame, height=15, width=70)
+        self.stats_text = scrolledtext.ScrolledText(parent, height=15, width=70)
         self.stats_text.pack(fill='both', expand=True, pady=(0, 10))
         self.stats_text.config(state=tk.DISABLED)
-        
         # Case complexity frame
-        complexity_frame = ttk.LabelFrame(self.stats_frame, text="Case Complexity", padding=10)
+        complexity_frame = ttk.LabelFrame(parent, text="Case Complexity", padding=10)
         complexity_frame.pack(fill='x', pady=5)
-        
         self.complexity_labels = {
             'simple': ttk.Label(complexity_frame, text="Simple Cases: 0"),
             'complex': ttk.Label(complexity_frame, text="Complex Cases: 0")
         }
         self.complexity_labels['simple'].pack(side='left', padx=10)
         self.complexity_labels['complex'].pack(side='left', padx=10)
-        
         # Peak hours frame
-        peak_frame = ttk.LabelFrame(self.stats_frame, text="Visit Timing", padding=10)
+        peak_frame = ttk.LabelFrame(parent, text="Visit Timing", padding=10)
         peak_frame.pack(fill='x', pady=5)
-        
         self.peak_labels = {
             'peak': ttk.Label(peak_frame, text="Peak Hours: 0"),
             'off_peak': ttk.Label(peak_frame, text="Off-Peak: 0")
@@ -491,7 +508,7 @@ class MedicalCertificateSystem:
             # Update statistics text
             self.stats_text.config(state=tk.NORMAL)
             self.stats_text.delete(1.0, tk.END)
-            
+
             # Format and display results
             self.stats_text.insert(tk.END, f"""Simulation Results Summary
             
@@ -503,46 +520,29 @@ Certificates Issued: {results.get('certificates_issued', 0)}
 Average Wait Time: {results.get('average_wait_time', 0):.2f} minutes
 Certificate Success Rate: {results.get('certificate_issuance_rate', 0):.1f}%
 
-Resource Utilization:
--------------------
-Doctors: {results.get('num_doctors', 0)}
-Nurses: {results.get('num_nurses', 0)}
-
 Case Distribution:
 ----------------
-Simple Cases: {results.get('simple_cases', 0)}
-Complex Cases: {results.get('complex_cases', 0)}
-Peak Hour Visits: {results.get('peak_hour_visits', 0)}
-Off-Peak Visits: {results.get('off_peak_visits', 0)}
-
-Decision Statistics:
------------------
-Nurse Decisions:
-- Referred to Emergency: {results.get('nurse_decisions', {}).get('refer', 0)}
-- Treated in Clinic: {results.get('nurse_decisions', {}).get('treat', 0)}
-
-Doctor Decisions:
-- Certificates Issued: {results.get('doctor_decisions', {}).get('issue', 0)}
-- Certificates Denied: {results.get('doctor_decisions', {}).get('deny', 0)}
+Cases: {results.get('simple_cases', 0)}
+Visits: {results.get('off_peak_visits', 0)}
 """)
             self.stats_text.config(state=tk.DISABLED)
-            
+
             # Update complexity labels
             self.complexity_labels['simple'].config(
-                text=f"Simple Cases: {results.get('simple_cases', 0)}"
+                text=f"Cases: {results.get('simple_cases', 0)}"
             )
-            self.complexity_labels['complex'].config(
-                text=f"Complex Cases: {results.get('complex_cases', 0)}"
-            )
-            
+            # Remove complex label if present
+            if 'complex' in self.complexity_labels:
+                self.complexity_labels['complex'].pack_forget()
+
             # Update peak hour labels
             self.peak_labels['peak'].config(
-                text=f"Peak Hours: {results.get('peak_hour_visits', 0)}"
+                text=f"Peak Hours: 0"
             )
             self.peak_labels['off_peak'].config(
-                text=f"Off-Peak: {results.get('off_peak_visits', 0)}"
+                text=f"Visits: {results.get('off_peak_visits', 0)}"
             )
-            
+
             # Add completion event
             self.add_event(
                 "Simulation Complete", 
