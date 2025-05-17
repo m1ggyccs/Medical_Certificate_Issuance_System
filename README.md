@@ -1,97 +1,108 @@
-# Medical Certificate Issuance Support System
+# 🏥 TIP Clinic Simulation Project
 
-A Python-based expert system and simulation platform for managing medical certificate issuance in a clinical setting.
+A simulation-based comparative analysis of patient certificate processing efficiency in the **Technological Institute of the Philippines (TIP) Clinic**, using **Agent-Based Simulation (ABS)** and **Survey-Based Simulation (SBS)**.
 
-## Features
+---
 
-- User-friendly GUI for patient data entry and certificate management
-- Expert system for automated decision support
-- Clinic operation simulation for resource planning
-- SQLite database for data persistence
-- Logging system for audit trails
-- Report generation capabilities
+## 🎯 Objective
 
-## Requirements
+To evaluate and compare the performance of Agent-Based and Survey-Based models in managing clinic resources and patient flows, aiming to:
 
-- Python 3.7+
-- Required packages listed in `requirements.txt`
+- Reduce wait times
+- Increase certificate issuance success rates
+- Optimize clinic staffing decisions
 
-## Installation
+---
 
-1. Clone the repository
-2. Create a virtual environment (recommended):
+## ⚙️ Simulation Parameters
+
+| Parameter              | Value        |
+|------------------------|--------------|
+| **Doctors**            | 1            |
+| **Nurses**             | 3            |
+| **Clinic Duration**    | 8 hours      |
+| **Nurse Inquiry Time** | 5 minutes    |
+| **Simple Case Time**   | 3 minutes    |
+| **Complex Case Time**  | 10 minutes   |
+| **Finalization Time**  | 2 minutes    |
+
+---
+
+## 🧪 Methodology
+
+### Agent-Based Simulation (ABS)
+
+Simulates individual interactions between patients and clinic staff to model realistic, dynamic behaviors.
+
+### Survey-Based Simulation (SBS)
+
+Utilizes statistical averages from surveys to model clinic operations with simplified assumptions.
+
+Each scenario (Best, Average, Worst) is tested with **5 simulation runs** for both models.
+
+---
+
+## 📈 Key Metrics Evaluated
+
+- **Total Patients Seen**
+- **Certificates Issued**
+- **Average Wait Time**
+- **Certificate Success Rate**
+
+---
+
+## 📊 Results Summary
+
+| Scenario   | ABS Avg Wait Time | SBS Avg Wait Time | ABS Success Rate | SBS Success Rate |
+|------------|-------------------|-------------------|------------------|------------------|
+| Best Case  | ~6.3 mins         | ~15.7 mins        | ~73%             | ~68%             |
+| Average    | ~9.0 mins         | ~15.5 mins        | ~74%             | ~67%             |
+| Worst Case | ~12.7 mins        | ~15.6 mins        | ~66%             | ~62%             |
+
+---
+
+## 💡 Key Insights
+
+- **ABS consistently outperforms SBS** in terms of average wait times and certificate success rates.
+- ABS provides more realistic and adaptive behavior modeling.
+- SBS offers simplicity and speed but lacks dynamic interaction depth.
+- Results can inform clinic staffing and policy decisions.
+
+---
+
+## 📁 Repository Structure
+
+📁 Medical-Certificate-Issuance-System/
+├── main.py # Entry point for running simulations
+├── simulation.py # Core simulation logic for agent-based and survey-based models
+├── expert_system.py # Rules for handling medical cases
+├── expert_system_demo.py # Demo to showcase expert system separately
+├── predefined_cases.py # Predefined patient cases for simulation
+├── medical_certificate # Sample data and case templates (text format)
+├── requirements # Required Python packages (txt format)
+├── README.md # This documentation file
+├── .gitattributes # Git configuration
+└── pycache/ # Python cache folder (auto-generated)
+---
+
+## 🚀 How to Use
+
+1. **Clone the repository:**
+
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+   git clone https://github.com/your-username/clinic-simulation-project.git
+   cd clinic-simulation-project
 
-## Usage
+📜 License
+This project is licensed under the MIT License.
 
-Run the main application:
-```bash
-python main.py
-```
+👥 Contributors
+m1ggycss - mamdavid@tip.edu.ph
 
-The system provides:
-- Patient information entry
-- Automated certificate issuance recommendations
-- Clinic simulation tools
-- Statistical reporting
+Course: Modeling and Simulation and Expert System
 
-## Components
+Institution: Technological Institute of the Philippines
 
-1. **Main Application** (`main.py`)
-   - GUI interface
-   - Database management
-   - Form processing
+📬 Contact
+For inquiries, suggestions, or collaborations, feel free to open an issue or reach out via email.
 
-2. **Expert System** (`expert_system.py`)
-   - Rule-based decision making
-   - Symptom severity assessment
-   - Certificate issuance recommendations
-
-3. **Simulation Engine** (`simulation.py`)
-   - Clinic operation simulation
-   - Resource utilization analysis
-   - Performance metrics
-
-## Database Schema
-
-The system uses SQLite with the following main table:
-
-```sql
-CREATE TABLE patients (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    student_id TEXT NOT NULL,
-    date_of_birth DATE,
-    symptoms TEXT,
-    diagnosis TEXT,
-    certificate_issued BOOLEAN,
-    date_issued DATETIME
-)
-```
-
-## Logging
-
-The system maintains logs in `medical_certificate.log` for:
-- Certificate issuance events
-- Expert system decisions
-- Simulation runs
-- Error tracking
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
