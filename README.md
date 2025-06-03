@@ -103,6 +103,3 @@ Course: Modeling and Simulation and Expert System
 
 Institution: Technological Institute of the Philippines
 
-📬 Contact
-For inquiries, suggestions, or collaborations, feel free to open an issue or reach out via email.
-
